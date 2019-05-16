@@ -6,8 +6,8 @@ This software is used strictly with the SputterAutomation project.
 
 ## Prerequisites
 1. A virtual COM port emulator. Null-modem emulator (com0com) is highly recommended.
-  - Links: * http://com0com.sourceforge.net/
-           * https://sourceforge.net/projects/com0com/      
+  - Links: http://com0com.sourceforge.net/
+           https://sourceforge.net/projects/com0com/      
 2. Ensure that the following COM ports are unused:
   * COM1
   * COM2
