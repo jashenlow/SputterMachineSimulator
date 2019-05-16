@@ -21,8 +21,9 @@ This software is used strictly with the SputterAutomation project.
 2. Click "Add Pair".
 3. In the newly created pair, check boxes "Use Ports class" and "emulate baud rate".
 4. Change one of the port names to one of the ports listed above in **Prerequisites Step 2**. The other port in the pair can be named as you wish. Example: COM5, COM8, COM9...etc.
-5. Repeat step 2 to step 5.
-6. An example of a completed setup would look like the following:
+5. Click "Apply".
+6. Repeat step 2 to step 5 until all the ports in **Prerequisites Step 2** have been assigned a pair.
+7. An example of a completed setup would look like the following:
      * COM5 <-----> COM1
      * COM7 <-----> COM2
      * COM8 <-----> COM3
