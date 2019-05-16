@@ -3,6 +3,10 @@
 KJLOperation::KJLOperation(QObject *parent) :
     QObject (parent)
 {
+    m_rampTimer = new QTimer(this);
+    m_rampTimer->setTimerType(Qt::PreciseTimer);
+    m_rampTimer->setInterval(100);  //Triggers a timeout every 100ms.
+
     m_ui = nullptr;
 }
 
@@ -17,6 +21,7 @@ void KJLOperation::setUiPointers(Ui::MainWindow *ptr)
     {
         m_ui = ptr;
     }
+    connect(m_rampTimer, &QTimer::timeout, this, &KJLOperation::rampTimer_timeout, Qt::QueuedConnection);
 }
 
 void KJLOperation::KJLloadDefaults()
@@ -26,6 +31,7 @@ void KJLOperation::KJLloadDefaults()
     limit_maxPower = 300;
     limit_impedance = 1000;
     limit_DCVoltage = 9999;
+    limit_rampTime = 9999000;
     limit_dissipation = true;
 
     alarm_EXT = false;
@@ -38,6 +44,7 @@ void KJLOperation::KJLloadDefaults()
 
     rampUpTime     = 1000;  //1 second
     rampDownTime   = 1000;
+    rampFinalPower = 0;
     reflectedPower = 0;
     powerSetPoint  = 0;
     forwardPower   = 0;
@@ -60,7 +67,71 @@ void KJLOperation::KJLloadDefaults()
     setCapPosition(true, loadCapPos);
     setCapPosition(false, tuneCapPos);
     setPowerSetPoint(powerSetPoint);
-    setOutputRamping(false);
+    setOutputRamping(true);
+}
+
+void KJLOperation::rampTimer_timeout()
+{
+    double dblForwardPower = double(forwardPower);
+
+    if (qRound(dblForwardPower) != rampFinalPower)
+    {
+        if (dblForwardPower < rampFinalPower)
+        {
+            dblForwardPower += rampStepSize;
+
+            if ((dblForwardPower + rampStepSize) > rampFinalPower)  //To avoid infinite back and forth due to double precision numbers.
+            {
+                dblForwardPower = rampFinalPower;
+            }
+        }
+        else if (dblForwardPower > rampFinalPower)
+        {
+            dblForwardPower -= rampStepSize;
+
+            if ((dblForwardPower - rampStepSize) < rampFinalPower)  //To avoid infinite back and forth due to double precision numbers.
+            {
+                dblForwardPower = rampFinalPower;
+            }
+        }
+        forwardPower = qRound(dblForwardPower);
+        m_ui->lblKJL1_L1P2->setText(QString::number(forwardPower) + "W");
+    }
+
+    if (forwardPower == rampFinalPower)
+    {
+        m_rampTimer->stop();
+        if (!outputStatus)
+        {
+            setOutput(outputStatus);    //For updating the display on the UI.
+        }
+    }
+}
+
+void KJLOperation::outputRamping(bool mode)     //true = Turning output ON or changing setpoint. false = Turning output OFF.
+{
+    if (mode)
+    {
+        if (powerSetPoint > forwardPower)
+        {
+            rampSteps = rampUpTime / 100;
+            rampStepSize = (powerSetPoint - forwardPower) / rampSteps;
+        }
+        else if (powerSetPoint < forwardPower)
+        {
+            rampSteps = rampDownTime / 100;
+            rampStepSize = (forwardPower - powerSetPoint) / rampSteps;
+        }
+        rampFinalPower = powerSetPoint;
+        m_rampTimer->start();
+    }
+    else
+    {
+        rampSteps = rampDownTime / 100;
+        rampFinalPower = 0;
+        rampStepSize = (forwardPower - rampFinalPower) / rampSteps;
+        m_rampTimer->start();
+    }
 }
 
 void KJLOperation::setEchoMode(bool mode)
@@ -89,23 +160,49 @@ void KJLOperation::setOutput(bool status)
 {
     if (status)
     {
+        outputStatus = true;
+
+        if (outputRamping_EN)
+        {
+            if (!m_rampTimer->isActive())
+            {
+                outputRamping(true);
+            }
+        }
+        else
+        {
+            forwardPower = powerSetPoint;
+        }
         m_ui->lblKJL1_L1P1->setText("FWD:");
         m_ui->lblKJL1_L1P2->setText(QString::number(forwardPower) + "W");
 
         m_ui->lblKJL1_OutputOn->setStyleSheet("background-color: red;");
         m_ui->lblKJL1_OutputOff->setStyleSheet("background-color: gray;");
-
-        outputStatus = true;
     }
     else
     {
-        m_ui->lblKJL1_L1P1->setText("SET:");
-        m_ui->lblKJL1_L1P2->setText(QString::number(powerSetPoint) + "W");
-
-        m_ui->lblKJL1_OutputOn->setStyleSheet("background-color: gray;");
-        m_ui->lblKJL1_OutputOff->setStyleSheet("background-color: rgb(0, 170, 255);");  //Slightly more blue than cyan.
-
         outputStatus = false;
+
+        if (outputRamping_EN)
+        {
+            if (forwardPower > 0)
+            {
+                outputRamping(false);
+            }
+        }
+        else
+        {
+            forwardPower = 0;
+        }
+
+        if (forwardPower == 0)
+        {
+            m_ui->lblKJL1_L1P1->setText("SET:");
+            m_ui->lblKJL1_L1P2->setText(QString::number(powerSetPoint) + "W");
+
+            m_ui->lblKJL1_OutputOn->setStyleSheet("background-color: gray;");
+            m_ui->lblKJL1_OutputOff->setStyleSheet("background-color: rgb(0, 170, 255);");  //Slightly more blue than cyan.
+        }
     }
 }
 
@@ -116,6 +213,21 @@ void KJLOperation::setPowerSetPoint(int value)
     if (!outputStatus)
     {
         m_ui->lblKJL1_L1P2->setText(QString::number(powerSetPoint) + "W");
+    }
+    else
+    {
+        if (outputRamping_EN)
+        {
+            if (powerSetPoint != forwardPower)
+            {
+                outputRamping(true);
+            }
+        }
+        else
+        {
+            forwardPower = powerSetPoint;
+            m_ui->lblKJL1_L1P2->setText(QString::number(forwardPower) + "W");
+        }
     }
 }
 
@@ -170,7 +282,7 @@ void KJLOperation::setRampDownTime(int time)
 {
     if (outputRamping_EN)
     {
-        rampDownTime = time;
+        rampDownTime = time * 1000;
     }
 }
 
@@ -178,7 +290,7 @@ void KJLOperation::setRampUpTime(int time)
 {
     if (outputRamping_EN)
     {
-        rampUpTime = time;
+        rampUpTime = time * 1000;
     }
 }
 

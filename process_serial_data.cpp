@@ -254,6 +254,9 @@ void ProcessSerialData::processKJL(QByteArray command)  //TODO: implement error 
     }
     else if (command.contains(" DN") && (command.back() == 'N'))    //Set ramp down time.
     {
+        replyCommand.append('\r');
+        emit writeToKJLPort(replyCommand);
+
         for (int i = 0; i < command.indexOf(' '); i++)
         {
             commandData.append(command[i]);
@@ -267,6 +270,9 @@ void ProcessSerialData::processKJL(QByteArray command)  //TODO: implement error 
     }
     else if (command.contains(" UP") && (command.back() == 'P'))    //Set ramp up time.
     {
+        replyCommand.append('\r');
+        emit writeToKJLPort(replyCommand);
+
         for (int i = 0; i < command.indexOf(' '); i++)
         {
             commandData.append(command[i]);
@@ -406,6 +412,9 @@ void ProcessSerialData::processKJL2(QByteArray command)  //TODO: implement error
     }
     else if (command.contains(" DN") && (command.back() == 'N'))    //Set ramp down time.
     {
+        replyCommand.append('\r');
+        emit writeToKJL2Port(replyCommand);
+
         for (int i = 0; i < command.indexOf(' '); i++)
         {
             commandData.append(command[i]);
@@ -419,6 +428,9 @@ void ProcessSerialData::processKJL2(QByteArray command)  //TODO: implement error
     }
     else if (command.contains(" UP") && (command.back() == 'P'))    //Set ramp up time.
     {
+        replyCommand.append('\r');
+        emit writeToKJL2Port(replyCommand);
+
         for (int i = 0; i < command.indexOf(' '); i++)
         {
             commandData.append(command[i]);

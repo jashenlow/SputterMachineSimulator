@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <QTimer>
 #include "ui_mainwindow.h"
 
 class KJL2Operation : public QObject
@@ -35,6 +36,9 @@ public slots:
     void setRampDownTime(int time);
     void setRampUpTime(int time);
 
+private slots:
+    void rampTimer_timeout();
+
 private:
     Ui::MainWindow  *m_ui;
 
@@ -44,9 +48,11 @@ private:
     bool commsLinkStatus;   //true = Fault, false = OK
     bool outputStatus, interlockStatus, echoStatus;
     bool alarm_EXT, alarm_PAC, alarm_REF, alarm_MAX, alarm_TMP, alarm_XIMP, alarm_REF_EN;
-    int powerSetPoint, forwardPower, controlSource, outputRegFeedback, loadCapPos, tuneCapPos, DCBias, reflectedPower;
-    int rampUpTime, rampDownTime;
-    int limit_maxPower, limit_refPower, limit_PACurrent, limit_impedance, limit_temp, limit_DCVoltage, limit_dissipation;
+    int controlSource, outputRegFeedback, loadCapPos, tuneCapPos, DCBias, reflectedPower, forwardPower, powerSetPoint;
+    int rampUpTime, rampDownTime, rampSteps, rampFinalPower;
+    double rampStepSize;
+    unsigned int limit_maxPower, limit_refPower, limit_PACurrent, limit_impedance, limit_temp, limit_DCVoltage, limit_dissipation;
+    unsigned long limit_rampTime;
     QString alarmStatus;
 
     enum ControlandSetpointSource
@@ -73,8 +79,10 @@ private:
     };
 
     Alarm   m_alarm;
+    QTimer  *m_rampTimer;
 
     void setAlarmStatus(QString status);
+    void outputRamping(bool mode);
 };
 
 #endif // KJL2_OPERATION_H
