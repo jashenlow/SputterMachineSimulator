@@ -15,7 +15,7 @@ This software is used strictly with the SputterAutomation project.
   * COM4
   * COM6
   
-##Using the Null-modem emulator (com0com)
+## Using the Null-modem emulator (com0com)
 1. Open (Installation Directory)\com0com\setupg.exe
 2. Click "Add Pair".
 3. In the newly created pair, check boxes "Use Ports class" and "emulate baud rate".
