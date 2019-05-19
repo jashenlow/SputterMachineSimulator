@@ -35,7 +35,7 @@ void MFCOperation::MFCloadDefaults()
     CH1_valveState = false;
     CH1_unit = Unit::SCCM;
     RNG1 = 100.0;
-    SP1 = 0;
+    SP1 = 1 * RNG1;
     FL1 = 100.0;
     GAIN1 = 1.0;
     OFFS1 = 0.0;
@@ -43,7 +43,7 @@ void MFCOperation::MFCloadDefaults()
     CH2_valveState = false;
     CH2_unit = Unit::SCCM;
     RNG2 = 100.0;
-    SP2 = 0.0;
+    SP2 = 1 * RNG2;
     FL2 = 100.0;
     GAIN2 = 1.0;
     OFFS2 = 0.0;
@@ -70,7 +70,7 @@ void MFCOperation::MFCloadDefaults()
 }
 
 void MFCOperation::updateDisplay()
-{
+{    
     switch (displayNumber)
     {
         case 1:
@@ -214,11 +214,11 @@ void MFCOperation::queryActualValue(char channel)
     switch (channel)
     {
         case '1':
-            dataToSend.append(QString::number(SP1));
+            dataToSend.append(QString::number(FL1));
             emit writetoMFCPort(dataToSend);
             break;
         case '2':
-            dataToSend.append(QString::number(SP2));
+            dataToSend.append(QString::number(FL2));
             emit writetoMFCPort(dataToSend);
             break;
     }
@@ -232,11 +232,12 @@ void MFCOperation::queryActualValueSetSetpoint(char channel, double setPoint)
     {
         case '1':
             SP1 = setPoint;
+            FL1 = SP1;
             break;
         case '2':
             SP2 = setPoint;
+            FL2 = SP2;
             break;
     }
     updateDisplay();
-
 }
