@@ -10,6 +10,7 @@
 #include "KJL2_operation.h"
 #include "MFC_operation.h"
 #include "Hofi_operation.h"
+#include "sps_config.h"
 
 namespace Ui {
 class MainWindow;
@@ -40,10 +41,11 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    SPSConfig           *m_SPSConfig;
     ProcessSerialData   *m_processSerialData;
     CesarOperation      *m_cesarOperation;
     KJLOperation        *m_KJLOperation;
-    KJL2Operation        *m_KJL2Operation;
+    KJL2Operation       *m_KJL2Operation;
     MFCOperation        *m_MFCOperation;
     HofiOperation       *m_hofiOperation;
     QMessageBox         m_msgBox;

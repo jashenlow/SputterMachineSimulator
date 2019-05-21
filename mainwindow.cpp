@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    m_SPSConfig = new SPSConfig(this);
     m_processSerialData = new ProcessSerialData(this);
     m_cesarOperation = new CesarOperation(this);
     m_KJLOperation = new KJLOperation(this);
@@ -19,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_KJL2Operation->KJL2loadDefaults();
     m_MFCOperation->MFCloadDefaults();
     m_hofiOperation->hofiLoadDefaults();
-
     m_processSerialData->m_serialConfig->enumeratePorts();
     initSerialComboBoxes();
     m_processSerialData->m_serialConfig->closePorts();
@@ -75,9 +75,10 @@ void MainWindow::initUiPointers()   //Initialises pointers used to change UI ele
 
 void MainWindow::connectSignals()
 {
-    //Connections for serial logs.
+    //Connections for logs.
     connect(m_processSerialData->m_serialConfig, &SerialConfig::sendToLog, this, &MainWindow::receiveLog, Qt::QueuedConnection);
     connect(m_processSerialData, &ProcessSerialData::sendToLog, this, &MainWindow::receiveLog, Qt::QueuedConnection);
+    connect(m_SPSConfig, &SPSConfig::sendToLog, this, &MainWindow::receiveLog, Qt::QueuedConnection);
 
     //Connections for writing to serial port.
     connect(m_processSerialData, &ProcessSerialData::writeToCesarPort, m_processSerialData->m_serialConfig, &SerialConfig::writeCesarPort, Qt::QueuedConnection);
@@ -171,6 +172,7 @@ void MainWindow::on_pbConnectPorts_released()
         }
         else
         {
+            m_SPSConfig->initTcpServer();
             m_processSerialData->m_serialConfig->initSerialPorts();
             ui->cbCesarPort->setEnabled(false);
             ui->cbKJLPort->setEnabled(false);
@@ -183,6 +185,7 @@ void MainWindow::on_pbConnectPorts_released()
     else if (ui->pbConnectPorts->text() == "Disconnect")
     {
         m_processSerialData->m_serialConfig->closePorts();
+        m_SPSConfig->stopListening();
         ui->cbCesarPort->setEnabled(true);
         ui->cbKJLPort->setEnabled(true);
         ui->cbKJL2Port->setEnabled(true);
