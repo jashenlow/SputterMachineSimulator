@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport
+QT       += core gui serialport network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -33,7 +33,8 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     process_serial_data.cpp \
-    serial_config.cpp
+    serial_config.cpp \
+    sps_config.cpp
 
 HEADERS += \
     Hofi_operation.h \
@@ -43,7 +44,8 @@ HEADERS += \
     cesar_operation.h \
         mainwindow.h \
     process_serial_data.h \
-    serial_config.h
+    serial_config.h \
+    sps_config.h
 
 FORMS += \
         mainwindow.ui
