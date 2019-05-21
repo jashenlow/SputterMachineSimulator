@@ -15,6 +15,10 @@ This software is used strictly with the SputterAutomation project.
   * COM3
   * COM4
   * COM6
+3. Microsoft Loopback Adapter.
+  - Instructions: https://www.schneider-electric.com/en/faqs/FA240071/
+  - When filling in the IP address field, enter 192.168.0.2.
+  - Allow any connections regarding the Loopback Adapter in your firewall.
   
 ## Using the Null-modem emulator (com0com)
 1. Open (Installation Directory)\com0com\setupg.exe
