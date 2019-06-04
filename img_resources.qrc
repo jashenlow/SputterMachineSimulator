@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/images">
         <file>images/form_icon2.jpg</file>
+        <file>images/Cesar_capdiagram.png</file>
+        <file>images/Cesar_ramp.png</file>
     </qresource>
 </RCC>
