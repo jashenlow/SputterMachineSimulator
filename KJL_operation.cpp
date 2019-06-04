@@ -59,8 +59,8 @@ void KJLOperation::KJLloadDefaults()
     pulseMode = false;  //DISABLED
     interlockStatus = false; //Assumes interface connector is connected, specifically for this simulator.
     commsLinkStatus = true;
-    echoStatus = false;  //Actual KJL seems to be configured this way.
 
+    setEchoMode(true);
     setAlarmStatus(alarmStatus);
     setControlSource("SERIAL");
     setOutput(false);   //Set output to Off.
