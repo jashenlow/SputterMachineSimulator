@@ -51,108 +51,45 @@ void ProcessSerialData::KJL2commsLinkTimeout()
     emit KJL2SetCommsLinkStatus(false);
 }
 
-QByteArray ProcessSerialData::assemblePacket(QByteArray packet)
-{
-    int dataLength = 0;
-    const int cesarAddress = 0x01;
-    int headerByte;
-
-    if (packet.length() > 1)
-    {
-        for (int i = 1; i < packet.length(); i++)   //Determine length of data bytes.
-        {
-            dataLength++;
-        }
-    }
-    if (dataLength < 7)
-    {
-        headerByte = (cesarAddress << 3) | dataLength;  //Create the header byte.
-        packet.prepend(char(headerByte));
-    }
-    else
-    {
-        headerByte = (cesarAddress << 3) | 0x07;  //Create the header byte.
-        packet.insert(1, char(dataLength)); //Insert optional data byte.
-        packet.prepend(char(headerByte));
-    }
-
-    packet.append(char(m_serialConfig->calculate_checkSum(packet)));    //Append checksum value to the end of the packet.
-    return packet;
-}
-
 void ProcessSerialData::processCesar(uint8_t command, QByteArray data)
 {
-    QByteArray replyPacket;
-    int regulationMode = 0;
-
-    //qDebug() << "cesar_readyToProcess emitted!";
+    int dataInt = 0;
 
     switch (command)
     {
         case 0xA8:   //168  //Report external feedback. (DC Bias) (unit: V)
-            replyPacket.append(char(command));
-            replyPacket.append(char(m_ui->leExternalFeedback->text().toInt() & 0xFF));
-            replyPacket.append(char(((m_ui->leExternalFeedback->text().toInt()) >> 8) & 0xFF));
-
-            replyPacket = assemblePacket(replyPacket);
-            emit writeToCesarPort(replyPacket);
-            //TODO: emit signal in cesar_operation.cpp
+            emit cesarReportExternalFeedback(command);
             break;
 
         case 0xA5:  //165   //Report Forward Power. (unit: W)
-            replyPacket.append(char(command));
-            replyPacket.append(char(m_ui->leForwardPower->text().toInt() & 0xFF));
-            replyPacket.append(char((m_ui->leForwardPower->text().toInt() >> 8) & 0xFF));
-
-            replyPacket = assemblePacket(replyPacket);
-            emit writeToCesarPort(replyPacket);
-            //TODO: emit signal in cesar_operation.cpp
+            emit cesarReportForwardPower(command);
             break;
 
         case 0xA6:  //166   //Report Reflected Power. (unit: W)
-            replyPacket.append(char(command));
-            replyPacket.append(char(m_ui->leReflectedPower->text().toInt() & 0xFF));
-            replyPacket.append(char((m_ui->leReflectedPower->text().toInt() >> 8) & 0xFF));
-
-            replyPacket = assemblePacket(replyPacket);
-            emit writeToCesarPort(replyPacket);
-            //TODO: emit signal in cesar_operation.cpp
+            emit cesarReportReflectedPower(command);
             break;
 
         case 0xAF:  //166   //Report Capacitor Positions. (unit: W) (Position value: 0 to 1000)
-            replyPacket.append(char(command));
-            replyPacket.append(char(m_ui->leLoadCapPos->text().toInt() & 0xFF));    //Load capacitor 1st byte.
-            replyPacket.append(char((m_ui->leLoadCapPos->text().toInt() >> 8) & 0xFF)); //Load capacitor 2nd byte.
-            replyPacket.append(char(m_ui->leTuneCapPos->text().toInt() & 0xFF));    //Tune capacitor 1st byte.
-            replyPacket.append(char((m_ui->leTuneCapPos->text().toInt() >> 8) & 0xFF)); //Tune capacitor 2nd byte.
-
-            replyPacket = assemblePacket(replyPacket);
-            emit writeToCesarPort(replyPacket);
-            //TODO: emit signal in cesar_operation.cpp
+            emit cesarReportCapPositions(command);
             break;
 
-        case 0xA4:  //166   //Report Set Point and Regulation Mode. (unit: W/V, int) (6 = Forward Power, 7 = Load Power, 8 = External Power)
-            replyPacket.append(char(command));
-            replyPacket.append(char(m_ui->leSetPoint->text().toInt() & 0xFF));  //Byte 0.
-            replyPacket.append(char((m_ui->leSetPoint->text().toInt() >> 8) & 0xFF));   //Byte 1.
-
-            if (m_ui->leRegMode->text() == "Forward Power")
-            {
-                regulationMode = 6;
-            }
-            else if (m_ui->leRegMode->text() == "Load Power")
-            {
-                regulationMode = 7;
-            }
-            else if (m_ui->leRegMode->text() == "External Power")
-            {
-                regulationMode = 8;
-            }
-            replyPacket.append(char(regulationMode));   //Byte 2.
-
-            replyPacket = assemblePacket(replyPacket);
-            emit writeToCesarPort(replyPacket);
-            //TODO: emit signal in cesar_operation.cpp
+        case 0xA4:  //166   //Report Set Point and Regulation Mode. (unit: W/V, int)
+            emit cesarReportSetPointandRegMode(command);
+            break;
+        case 0x01:  //1     //Turn output off.
+            emit cesarSetOutputState(false);
+            break;
+        case 0x02:  //2     //Turn output on.
+            emit cesarSetOutputState(true);
+            break;
+        case 0x03:  //3     //Set regulation mode.
+            emit cesarSetRegulationMode(data[0]);
+            break;
+        case 0x08:  //8     //Set power setpoint.
+            dataInt = uint8_t(data[1]) << 8;
+            dataInt |= uint8_t(data[0]);
+            qDebug() << "dataInt: " << dataInt;
+            emit cesarSetPowerSetPoint(dataInt);
             break;
     }
 }
