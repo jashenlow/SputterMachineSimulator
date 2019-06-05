@@ -65,7 +65,7 @@ void SPSConfig::stopListening()
     }
     else
     {
-        emit sendToLog("TCP Server already not listening");
+        emit sendToLog("TCP Server already closed");
     }
 }
 
@@ -75,8 +75,9 @@ void SPSConfig::readIncomingData()
 
     if (m_ServerSocket->bytesAvailable())
     {
-        receivedData = m_ServerSocket->readAll();
-        emit sendToLog("TCP received data: " + receivedData);
+        emit sendToLog("TCP received " + QString::number(m_ServerSocket->bytesAvailable()) + " bytes.");
+        receivedData.append(m_ServerSocket->readAll());
+        emit sendToLog("TCP received data: " + QString::fromLocal8Bit(receivedData.toHex('\\')).toUpper());
     }
 
     //m_ServerSocket->write("wassup");
