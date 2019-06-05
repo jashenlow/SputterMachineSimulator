@@ -19,9 +19,17 @@ public:
 signals:
     void sendToLog(QString data);
 
-    void writeToCesarPort(QByteArray packet);
     void writeToKJLPort(QByteArray command);
     void writeToKJL2Port(QByteArray command);
+
+    void cesarSetOutputState(bool state);
+    void cesarSetRegulationMode(int mode);
+    void cesarSetPowerSetPoint(int value);
+    void cesarReportExternalFeedback(uint8_t command);
+    void cesarReportForwardPower(uint8_t command);
+    void cesarReportReflectedPower(uint8_t command);
+    void cesarReportCapPositions(uint8_t command);
+    void cesarReportSetPointandRegMode(uint8_t command);
 
     void KJLSetOutput(bool status);
     void KJLSetPowerSetPoint(int value);
@@ -77,22 +85,6 @@ public slots:
 private:
     QTimer     *m_KJLcommsLinkTimer, *m_KJL2commsLinkTimer;
 
-    enum CSRcode    //Codes that are sent back to the PC after receiving any Cesar "set..." commands.
-    {
-        command_accepted = 0,
-        controlCode_isIncorrect,
-        output_isOn,
-        data_out_of_range = 4,
-        active_faults_exist = 7,
-        data_byte_count_isIncorrect = 9,
-        recipe_isActive = 19,
-        frequency_out_of_range = 50,
-        dutyCycle_out_of_range,
-        device_controlled_not_detected = 53,
-        command_not_accepted = 99
-    };
-
-    QByteArray  assemblePacket(QByteArray packet);
     int         KJLcommsLinkTime, KJL2commsLinkTime;
 
     Ui::MainWindow  *m_ui;
