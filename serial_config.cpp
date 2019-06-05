@@ -259,6 +259,7 @@ int SerialConfig::calculate_checkSum(QByteArray packet)
 
 void SerialConfig::writeCesarPort(QByteArray packet)
 {
+    packet.append(char(calculate_checkSum(packet)));
     if (cesarWriteQueue.length() > 0)   //This nested if statement prevents appending duplicates next to the first element.
     {
         if (cesarWriteQueue.first() == packet)
