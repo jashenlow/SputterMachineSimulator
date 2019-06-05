@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connectSignals();
     initUiPointers();
+    m_cesarOperation->cesarLoadDefaults();
     m_KJLOperation->KJLloadDefaults();
     m_KJL2Operation->KJL2loadDefaults();
     m_MFCOperation->MFCloadDefaults();
@@ -66,7 +67,8 @@ bool MainWindow::checkportNames()   //Checks for duplicate COM port selections.
 
 void MainWindow::initUiPointers()   //Initialises pointers used to change UI elements.
 {
-    m_processSerialData->setUiPointers(ui); //TODO: Re-assign this statement to m_CesarOperation->setUiPointers(ui); after implementing more functionalities.
+    m_processSerialData->setUiPointers(ui);
+    m_cesarOperation->setUiPointers(ui);
     m_KJLOperation->setUiPointers(ui);
     m_KJL2Operation->setUiPointers(ui);
     m_MFCOperation->setUiPointers(ui);
@@ -81,7 +83,7 @@ void MainWindow::connectSignals()
     connect(m_SPSConfig, &SPSConfig::sendToLog, this, &MainWindow::receiveLog, Qt::QueuedConnection);
 
     //Connections for writing to serial port.
-    connect(m_processSerialData, &ProcessSerialData::writeToCesarPort, m_processSerialData->m_serialConfig, &SerialConfig::writeCesarPort, Qt::QueuedConnection);
+    connect(m_cesarOperation, &CesarOperation::writeToCesarPort, m_processSerialData->m_serialConfig, &SerialConfig::writeCesarPort, Qt::QueuedConnection);
     connect(m_processSerialData, &ProcessSerialData::writeToKJLPort, m_processSerialData->m_serialConfig, &SerialConfig::writeKJLPort, Qt::QueuedConnection);
     connect(m_KJLOperation, &KJLOperation::writeQueryData, m_processSerialData->m_serialConfig, &SerialConfig::writeKJLPort, Qt::QueuedConnection);
     connect(m_processSerialData, &ProcessSerialData::writeToKJL2Port, m_processSerialData->m_serialConfig, &SerialConfig::writeKJL2Port, Qt::QueuedConnection);
@@ -101,7 +103,14 @@ void MainWindow::connectSignals()
     connect(m_processSerialData->m_serialConfig, &SerialConfig::hofi_readyToProcess, m_processSerialData, &ProcessSerialData::processHofi, Qt::QueuedConnection);
 
     //Cesar operation connections.
-
+    connect(m_processSerialData, &ProcessSerialData::cesarReportExternalFeedback, m_cesarOperation, &CesarOperation::reportExternalFeedback, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarReportForwardPower, m_cesarOperation, &CesarOperation::reportForwardPower, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarReportReflectedPower, m_cesarOperation, &CesarOperation::reportReflectedPower, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarReportCapPositions, m_cesarOperation, &CesarOperation::reportCapPositions, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarReportSetPointandRegMode, m_cesarOperation, &CesarOperation::reportSetPointandRegMode, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetOutputState, m_cesarOperation, &CesarOperation::setOutputState, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetRegulationMode, m_cesarOperation, &CesarOperation::setRegulationMode, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetPowerSetPoint, m_cesarOperation, &CesarOperation::setPowerSetPoint, Qt::QueuedConnection);
 
     //KJL operation connections.
     connect(m_processSerialData, &ProcessSerialData::KJLSetOutput, m_KJLOperation, &KJLOperation::setOutput, Qt::QueuedConnection);
