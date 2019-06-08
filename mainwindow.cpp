@@ -111,6 +111,11 @@ void MainWindow::connectSignals()
     connect(m_processSerialData, &ProcessSerialData::cesarSetOutputState, m_cesarOperation, &CesarOperation::setOutputState, Qt::QueuedConnection);
     connect(m_processSerialData, &ProcessSerialData::cesarSetRegulationMode, m_cesarOperation, &CesarOperation::setRegulationMode, Qt::QueuedConnection);
     connect(m_processSerialData, &ProcessSerialData::cesarSetPowerSetPoint, m_cesarOperation, &CesarOperation::setPowerSetPoint, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetActiveControlMode, m_cesarOperation, &CesarOperation::setActiveControlMode, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetMatchNetworkControl, m_cesarOperation, &CesarOperation::setMatchNetworkControl, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetReflectedPowerLimit, m_cesarOperation, &CesarOperation::setReflectedPowerLimit, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetReflectedPowerParameters, m_cesarOperation, &CesarOperation::setReflectedPowerParameters, Qt::QueuedConnection);
+    connect(m_processSerialData, &ProcessSerialData::cesarSetCapPositions, m_cesarOperation, &CesarOperation::setCapPositions, Qt::QueuedConnection);
 
     //KJL operation connections.
     connect(m_processSerialData, &ProcessSerialData::KJLSetOutput, m_KJLOperation, &KJLOperation::setOutput, Qt::QueuedConnection);
