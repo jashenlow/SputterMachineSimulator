@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <QTimer>
 #include "ui_mainwindow.h"
 
 class CesarOperation : public QObject
@@ -21,9 +22,14 @@ signals:
 
 
 public slots:  
-    void setOutputState(bool state);
-    void setRegulationMode(char mode);
-    void setPowerSetPoint(int value);
+    void setOutputState(uint8_t command, bool state);
+    void setRegulationMode(uint8_t command, char mode);
+    void setPowerSetPoint(uint8_t command, int value);
+    void setActiveControlMode(uint8_t command, int mode);
+    void setMatchNetworkControl(uint8_t command, int mode);
+    void setReflectedPowerLimit(uint8_t command, int value);
+    void setReflectedPowerParameters(uint8_t command, int time, int value);
+    void setCapPositions(uint8_t cmmand, bool cap, int value);
 
     void reportExternalFeedback(uint8_t command);
     void reportForwardPower(uint8_t command);
@@ -31,9 +37,16 @@ public slots:
     void reportCapPositions(uint8_t command);
     void reportSetPointandRegMode(uint8_t command);
 
+private slots:
+    void rampTimeout();
+    void startRamping(bool mode);
+
 private:
-    int setPoint, forwardPower, reflectedPower, DCBias, regulationMode;
-    int loadCapPos, tuneCapPos;
+    bool ramping_EN;
+    int setPoint, forwardPower, reflectedPower, DCBias, regulationMode, activeControlMode;
+    int matchNetworkControl, reflectedPowerLimit, reflectedPowerLimitTime, forwardPowerLimit;
+    int rampFinalPower, rampSteps;
+    double loadCapPos, tuneCapPos, rampUpTime, rampDownTime, rampStepSize, dblForwardPower;
     bool outputState;
 
     enum RegulationMode
@@ -41,6 +54,21 @@ private:
         ForwardPower = 6,
         RealPower,
         Bias
+    };
+
+    enum ActiveControlMode
+    {
+        Host = 2,
+        User = 4,
+        FrontPanel = 6
+        //More modes exist but they aren't important.
+    };
+
+    enum MatchNetworkControl
+    {
+        Manual = 0,
+        Auto,
+        Auto_With_Init
     };
 
     enum CSRcode    //Codes that are sent back to the PC after receiving any Cesar "set..." commands.
@@ -60,8 +88,10 @@ private:
 
     QByteArray assemblePacket(QByteArray packet);
     void sendReply(QByteArray data);
+    void updateDisplay();
 
     Ui::MainWindow  *m_ui;
+    QTimer          *m_rampTimer;
 
 };
 
