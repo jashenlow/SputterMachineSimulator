@@ -50,7 +50,7 @@ private:
     bool alarm_EXT, alarm_PAC, alarm_REF, alarm_MAX, alarm_TMP, alarm_XIMP, alarm_REF_EN;
     int controlSource, outputRegFeedback, loadCapPos, tuneCapPos, DCBias, reflectedPower, forwardPower, powerSetPoint;
     int rampUpTime, rampDownTime, rampSteps, rampFinalPower;
-    double rampStepSize;
+    double rampStepSize, dblForwardPower;
     unsigned int limit_maxPower, limit_refPower, limit_PACurrent, limit_impedance, limit_temp, limit_DCVoltage, limit_dissipation;
     unsigned long limit_rampTime;
     QString alarmStatus;

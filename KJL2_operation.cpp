@@ -72,8 +72,6 @@ void KJL2Operation::KJL2loadDefaults()
 
 void KJL2Operation::rampTimer_timeout()
 {
-    double dblForwardPower = double(forwardPower);
-
     if (qRound(dblForwardPower) != rampFinalPower)
     {
         if (dblForwardPower < rampFinalPower)
@@ -101,6 +99,7 @@ void KJL2Operation::rampTimer_timeout()
     if (forwardPower == rampFinalPower)
     {
         m_rampTimer->stop();
+        dblForwardPower = 0;
         if (!outputStatus)
         {
             setOutput(outputStatus);    //For updating the display on the UI.
@@ -115,21 +114,23 @@ void KJL2Operation::outputRamping(bool mode)     //true = Turning output ON or c
         if (powerSetPoint > forwardPower)
         {
             rampSteps = rampUpTime / 100;
-            rampStepSize = (powerSetPoint - forwardPower) / rampSteps;
+            rampStepSize = double(powerSetPoint - forwardPower) / rampSteps;
         }
         else if (powerSetPoint < forwardPower)
         {
             rampSteps = rampDownTime / 100;
-            rampStepSize = (forwardPower - powerSetPoint) / rampSteps;
+            rampStepSize = double(forwardPower - powerSetPoint) / rampSteps;
         }
         rampFinalPower = powerSetPoint;
+        dblForwardPower = forwardPower;
         m_rampTimer->start();
     }
     else
     {
         rampSteps = rampDownTime / 100;
         rampFinalPower = 0;
-        rampStepSize = (forwardPower - rampFinalPower) / rampSteps;
+        rampStepSize = double(forwardPower - rampFinalPower) / rampSteps;
+        dblForwardPower = forwardPower;
         m_rampTimer->start();
     }
 }
