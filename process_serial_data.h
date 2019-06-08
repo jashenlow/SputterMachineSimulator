@@ -22,9 +22,14 @@ signals:
     void writeToKJLPort(QByteArray command);
     void writeToKJL2Port(QByteArray command);
 
-    void cesarSetOutputState(bool state);
-    void cesarSetRegulationMode(int mode);
-    void cesarSetPowerSetPoint(int value);
+    void cesarSetOutputState(uint8_t command, bool state);
+    void cesarSetRegulationMode(uint8_t command, int mode);
+    void cesarSetPowerSetPoint(uint8_t command, int value);
+    void cesarSetActiveControlMode(uint8_t command, int mode);
+    void cesarSetMatchNetworkControl(uint8_t command, int value);
+    void cesarSetReflectedPowerLimit(uint8_t command, int value);
+    void cesarSetReflectedPowerParameters(uint8_t command, int powerLimitTime, int powerLimit);
+    void cesarSetCapPositions(uint8_t command, bool cap, int position);
     void cesarReportExternalFeedback(uint8_t command);
     void cesarReportForwardPower(uint8_t command);
     void cesarReportReflectedPower(uint8_t command);

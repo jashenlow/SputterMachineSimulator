@@ -53,7 +53,7 @@ void ProcessSerialData::KJL2commsLinkTimeout()
 
 void ProcessSerialData::processCesar(uint8_t command, QByteArray data)
 {
-    int dataInt = 0;
+    int dataInt = 0, dataInt2 = 0;
 
     switch (command)
     {
@@ -77,19 +77,47 @@ void ProcessSerialData::processCesar(uint8_t command, QByteArray data)
             emit cesarReportSetPointandRegMode(command);
             break;
         case 0x01:  //1     //Turn output off.
-            emit cesarSetOutputState(false);
+            emit cesarSetOutputState(command, false);
             break;
         case 0x02:  //2     //Turn output on.
-            emit cesarSetOutputState(true);
+            emit cesarSetOutputState(command, true);
             break;
         case 0x03:  //3     //Set regulation mode.
-            emit cesarSetRegulationMode(data[0]);
+            emit cesarSetRegulationMode(command, data[0]);
             break;
         case 0x08:  //8     //Set power setpoint.
             dataInt = uint8_t(data[1]) << 8;
             dataInt |= uint8_t(data[0]);
-            qDebug() << "dataInt: " << dataInt;
-            emit cesarSetPowerSetPoint(dataInt);
+            emit cesarSetPowerSetPoint(command, dataInt);
+            break;
+        case 0x0E:  //14    //Set Active Control Mode.
+            dataInt = uint8_t(data[0]);
+            emit cesarSetActiveControlMode(command, dataInt);
+            break;
+        case 0x0D:  //13    //Set Match Network Control.
+            dataInt = uint8_t(data[0]);
+            emit cesarSetMatchNetworkControl(command, dataInt);
+            break;
+        case 0x05:  //5     //Set reflected power limit.
+            dataInt = uint8_t(data[1]) << 8;
+            dataInt |= uint8_t(data[0]);
+            emit cesarSetReflectedPowerLimit(command, dataInt);
+            break;
+        case 0x21:  //33     //Set reflected power parameters.
+            dataInt = uint8_t(data[0]);
+            dataInt2 = uint8_t(data[2]) << 8;
+            dataInt2 |= uint8_t(data[1]);
+            emit cesarSetReflectedPowerParameters(command, dataInt, dataInt2);
+            break;
+        case 0x70:  //112     //Set load capacitor position.
+            dataInt = uint8_t(data[1]) << 8;
+            dataInt |= uint8_t(data[0]);
+            emit cesarSetCapPositions(command, true, dataInt);
+            break;
+        case 0x7A:  //122     //Set tune capacitor position.
+            dataInt = uint8_t(data[1]) << 8;
+            dataInt |= uint8_t(data[0]);
+            emit cesarSetCapPositions(command, false, dataInt);
             break;
     }
 }
