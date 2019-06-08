@@ -2011,7 +2011,7 @@ color: rgb(0, 0, 0);</string>
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="lblCesarRamp_2">
+     <widget class="QLabel" name="lblCesarCapacitors">
       <property name="geometry">
        <rect>
         <x>210</x>
