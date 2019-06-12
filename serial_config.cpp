@@ -407,7 +407,6 @@ void SerialConfig::readCesarData()  //TODO: Write in thesis about the developmen
                     //qDebug() << "Cesar write queue:" << cesarWriteQueue;
                 }
                 cesarReceiveBuffer.remove(0, 1);    //Remove 1st element in cesarReceiveBuffer.
-                readValidPacket(cesarReceiveBuffer);
             }
             else if (cesarReceiveBuffer[0] == char(0x15))
             {
