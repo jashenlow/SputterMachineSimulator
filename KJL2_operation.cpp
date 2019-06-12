@@ -13,6 +13,7 @@ KJL2Operation::KJL2Operation(QObject *parent) :
 KJL2Operation::~KJL2Operation()
 {
     delete m_ui;
+    delete m_rampTimer;
 }
 
 void KJL2Operation::setUiPointers(Ui::MainWindow *ptr)

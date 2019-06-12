@@ -30,6 +30,12 @@ SerialConfig::SerialConfig(QObject *parent) :
 SerialConfig::~SerialConfig()
 {
     closePorts();
+    delete m_cesarSerial;
+    delete m_KJLSerial;
+    delete m_KJL2Serial;
+    delete m_MFCSerial;
+    delete m_hofiSerial;
+    delete m_ACKTimer;
 }
 
 void SerialConfig::enumeratePorts()

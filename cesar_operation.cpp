@@ -13,6 +13,7 @@ CesarOperation::CesarOperation(QObject *parent) :
 CesarOperation::~CesarOperation()
 {
     delete m_ui;
+    delete m_rampTimer;
 }
 
 void CesarOperation::setUiPointers(Ui::MainWindow *ptr)

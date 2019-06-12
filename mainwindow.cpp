@@ -29,6 +29,13 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_SPSConfig;
+    delete m_processSerialData;
+    delete m_cesarOperation;
+    delete m_KJLOperation;
+    delete m_KJL2Operation;
+    delete m_MFCOperation;
+    delete m_hofiOperation;
 }
 
 void MainWindow::initSerialComboBoxes() //Add more entries here when more comboboxes are added.

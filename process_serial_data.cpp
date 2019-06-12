@@ -23,6 +23,8 @@ ProcessSerialData::ProcessSerialData(QObject *parent) :
 ProcessSerialData::~ProcessSerialData()
 {
     delete m_ui;
+    delete m_KJLcommsLinkTimer;
+    delete m_KJL2commsLinkTimer;
 }
 
 void ProcessSerialData::setUiPointers(Ui::MainWindow *ptr)

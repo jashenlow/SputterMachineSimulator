@@ -18,6 +18,7 @@ MFCOperation::MFCOperation(QObject *parent) :
 MFCOperation::~MFCOperation()
 {
     delete m_ui;
+    delete m_dispTimer;
 }
 
 void MFCOperation::setUiPointers(Ui::MainWindow *ptr)
