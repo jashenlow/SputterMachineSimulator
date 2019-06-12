@@ -237,7 +237,6 @@ void SerialConfig::readValidPacket(QByteArray packet)   //Checks for a valid pac
                 m_cesarSerial->waitForBytesWritten(-1);
                 emit sendToLog("Cesar ACK sent.");
                 emit cesar_readyToProcess(receivedCmd, dataBytes);    //emit signal to cesar_process.
-                //TODO: Start timer and wait 100ms for an ACK.
             }
             else
             {
