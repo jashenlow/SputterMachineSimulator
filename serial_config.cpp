@@ -15,11 +15,11 @@ SerialConfig::SerialConfig(QObject *parent) :
     m_ACKTimer->setSingleShot(true);
     connect(m_ACKTimer, &QTimer::timeout, this, &SerialConfig::cesarACKTimeout, Qt::QueuedConnection);
 
-    connect(m_cesarSerial, SIGNAL(readyRead()), this, SLOT(readCesarData()), Qt::QueuedConnection);
-    connect(m_KJLSerial, SIGNAL(readyRead()), this, SLOT(readKJLData()), Qt::QueuedConnection);
-    connect(m_KJL2Serial, SIGNAL(readyRead()), this, SLOT(readKJL2Data()), Qt::QueuedConnection);
-    connect(m_MFCSerial, SIGNAL(readyRead()), this, SLOT(readMFCData()), Qt::QueuedConnection);
-    connect(m_hofiSerial, SIGNAL(readyRead()), this, SLOT(readHofiData()), Qt::QueuedConnection);
+    connect(m_cesarSerial, &QSerialPort::readyRead, this, &SerialConfig::readCesarData, Qt::QueuedConnection);
+    connect(m_KJLSerial, &QSerialPort::readyRead, this, &SerialConfig::readKJLData, Qt::QueuedConnection);
+    connect(m_KJL2Serial, &QSerialPort::readyRead, this, &SerialConfig::readKJL2Data, Qt::QueuedConnection);
+    connect(m_MFCSerial, &QSerialPort::readyRead, this, &SerialConfig::readMFCData, Qt::QueuedConnection);
+    connect(m_hofiSerial, &QSerialPort::readyRead, this, &SerialConfig::readHofiData, Qt::QueuedConnection);
 
     //The following ports are used by the PC on the actual machine. The sputterautomation program will try to connect to these. Hence, they shouldn't be enumerated.
     forbiddenSerialPorts << "COM1" << "COM2" << "COM3" << "COM4" << "COM6";
