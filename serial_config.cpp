@@ -415,14 +415,9 @@ void SerialConfig::readCesarData()  //TODO: Write in thesis about the developmen
                 m_cesarSerial->waitForBytesWritten(-1);
                 cesarReceiveBuffer.remove(0, 1);    //Remove 1st element in cesarReceiveBuffer.
             }
-
-            if ((cesarReceiveBuffer[0] >> 3) == 0x01)
-            {
-                readValidPacket(cesarReceiveBuffer);
-            }
-
         }
-        else if ((cesarReceiveBuffer[0] >> 3) == 0x01)  //First byte is a valid header byte.
+
+        if ((cesarReceiveBuffer[0] >> 3) == 0x01)  //First byte is a valid header byte.
         {
             readValidPacket(cesarReceiveBuffer);
         }
