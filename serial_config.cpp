@@ -187,7 +187,7 @@ void SerialConfig::cesarACKTimeout()
 void SerialConfig::readValidPacket(QByteArray packet)   //Checks for a valid packet and disassembles it accordingly.
 {
     QByteArray dataBytes;
-    int dataStartIndex;
+    int dataStartIndex = 2; //Data bytes start at byte 2 of the packet by default.
     uint8_t receivedCmd;
     int dataLength;
     bool validLength = false;
@@ -209,17 +209,16 @@ void SerialConfig::readValidPacket(QByteArray packet)   //Checks for a valid pac
         if (packet.length() == (dataLength + 3))    //Check for valid packet length.
         {
             validLength = true;
-            dataStartIndex = 2;
-
-            if (dataLength != 0)
-            {
-                for (int i = dataStartIndex; i < (dataStartIndex + dataLength); i++)
-                {
-                    dataBytes.append(packet[i]);
-                }
-            }
         }
     }
+    if (dataLength != 0)
+    {
+        for (int i = dataStartIndex; i < (dataStartIndex + dataLength); i++)
+        {
+            dataBytes.append(packet[i]);
+        }
+    }
+
     if (validLength == true)
     {
         if (calculate_checkSum(packet) == 0x00)  //No transmission errors.
