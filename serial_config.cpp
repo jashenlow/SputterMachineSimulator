@@ -192,61 +192,55 @@ void SerialConfig::readValidPacket(QByteArray packet)   //Checks for a valid pac
     int dataLength;
     bool validLength = false;
 
-    if ((packet[0] >> 3) == 0x01)  //Verify that address sent is 0x01.
+    dataLength = packet[0] & 0x07;   //Determine number of data bytes.
+    receivedCmd = uint8_t(packet[1]); //Determine the command received.
+
+    if (dataLength == 7)    //More than 6 data bytes.
     {
-        dataLength = packet[0] & 0x07;   //Determine number of data bytes.
-        //qDebug() << "Data length:" << dataLength;
-
-        receivedCmd = uint8_t(packet[1]); //Determine the command received.
-        //qDebug() << "Command:" << receivedCmd;
-        if (dataLength == 7)    //More than 6 data bytes.
+        if (packet.length() == (dataLength + 4))    //Check for valid packet length.
         {
-            if (packet.length() == (dataLength + 4))    //Check for valid packet length.
-            {
-                validLength = true;
-                dataLength = packet[2];
-                dataStartIndex = 3;
-            }
+            validLength = true;
+            dataLength = packet[2];
+            dataStartIndex = 3;
         }
-        else
+    }
+    else
+    {
+        if (packet.length() == (dataLength + 3))    //Check for valid packet length.
         {
-            if (packet.length() == (dataLength + 3))    //Check for valid packet length.
-            {
-                validLength = true;
-                dataStartIndex = 2;
+            validLength = true;
+            dataStartIndex = 2;
 
-                if (dataLength != 0)
+            if (dataLength != 0)
+            {
+                for (int i = dataStartIndex; i < (dataStartIndex + dataLength); i++)
                 {
-                    for (int i = dataStartIndex; i < (dataStartIndex + dataLength); i++)
-                    {
-                        dataBytes.append(packet[i]);
-                    }
-                    //qDebug() << "Data bytes:" << dataBytes;
+                    dataBytes.append(packet[i]);
                 }
             }
         }
-        if (validLength == true)
+    }
+    if (validLength == true)
+    {
+        if (calculate_checkSum(packet) == 0x00)  //No transmission errors.
         {
-            if (calculate_checkSum(packet) == 0x00)  //No transmission errors.
-            {
-                //qDebug() << "Cesar received packet: " << cesarReceiveBuffer;
-                emit sendToLog("Cesar received packet: " + QString::fromLocal8Bit(cesarReceiveBuffer.toHex('\\')).toUpper());
+            //qDebug() << "Cesar received packet: " << cesarReceiveBuffer;
+            emit sendToLog("Cesar received packet: " + QString::fromLocal8Bit(cesarReceiveBuffer.toHex('\\')).toUpper());
 
-                //Reply ACK.
-                m_cesarSerial->write(QByteArray(1, 0x06), 1);
-                m_cesarSerial->waitForBytesWritten(-1);
-                emit sendToLog("Cesar ACK sent.");
-                emit cesar_readyToProcess(receivedCmd, dataBytes);    //emit signal to cesar_process.
-            }
-            else
-            {
-                //Reply NACK.
-                m_cesarSerial->write(QByteArray(1, 0x15), 1);
-                m_cesarSerial->waitForBytesWritten(-1);
-                emit sendToLog("Cesar NACK sent.");
-            }
-            cesarReceiveBuffer.clear();
+            //Reply ACK.
+            m_cesarSerial->write(QByteArray(1, 0x06), 1);
+            m_cesarSerial->waitForBytesWritten(-1);
+            emit sendToLog("Cesar ACK sent.");
+            emit cesar_readyToProcess(receivedCmd, dataBytes);    //emit signal to cesar_process.
         }
+        else
+        {
+            //Reply NACK.
+            m_cesarSerial->write(QByteArray(1, 0x15), 1);
+            m_cesarSerial->waitForBytesWritten(-1);
+            emit sendToLog("Cesar NACK sent.");
+        }
+        cesarReceiveBuffer.clear();
     }
 }
 
