@@ -164,15 +164,14 @@ QByteArray CesarOperation::assemblePacket(QByteArray packet)
     if (dataLength < 7)
     {
         headerByte = (cesarAddress << 3) | dataLength;  //Create the header byte.
-        packet.prepend(char(headerByte));
     }
     else
     {
         headerByte = (cesarAddress << 3) | 0x07;  //Create the header byte.
         packet.insert(1, char(dataLength)); //Insert optional data byte.
-        packet.prepend(char(headerByte));
     }
 
+    packet.prepend(char(headerByte));
     return packet;
 }
 
