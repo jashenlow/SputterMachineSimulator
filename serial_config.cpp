@@ -516,7 +516,6 @@ void SerialConfig::readMFCData()
 
 void SerialConfig::readHofiData()
 {
-    QByteArrayList  hofiCmdPrefixes = {"HOFIMAIN", "HOFIPORT", "HOFISTATU"};
     QByteArray organisedBuffer;
 
     if (m_hofiSerial->bytesAvailable())
@@ -527,33 +526,11 @@ void SerialConfig::readHofiData()
 
     if (hofiReceiveBuffer.length() >= 9)    //All Hofi commands have a length of 9.
     {
-        if (hofiReceiveBuffer.contains(hofiCmdPrefixes[0])) //Checking for "HOFIMAINE" or "HOFIMAINA".
-        {
-            if ((hofiReceiveBuffer[8] == 'E') || (hofiReceiveBuffer[8] == 'A'))
-            {
-                organisedBuffer = hofiReceiveBuffer.mid(0, 9);
-                emit sendToLog("Hofi received data: " + organisedBuffer);
-                emit hofi_readyToProcess(organisedBuffer);
-                hofiReceiveBuffer.remove(0, 9);
-            }
-        }
-        else if (hofiReceiveBuffer.contains(hofiCmdPrefixes[1]))
-        {
-            if ((hofiReceiveBuffer[8] >= '1') && (hofiReceiveBuffer[8] <= '5'))
-            {
-                organisedBuffer = hofiReceiveBuffer.mid(0, 9);
-                emit sendToLog("Hofi received data: " + organisedBuffer);
-                emit hofi_readyToProcess(organisedBuffer);
-                hofiReceiveBuffer.remove(0, 9);
-            }
-        }
-        else if (hofiReceiveBuffer.contains(hofiCmdPrefixes[2]))
-        {
-            organisedBuffer = hofiReceiveBuffer.mid(0, 9);
-            emit sendToLog("Hofi received data: " + organisedBuffer);
-            emit hofi_readyToProcess(organisedBuffer);
-            hofiReceiveBuffer.remove(0, 9);
-        }
+        organisedBuffer = hofiReceiveBuffer.mid(0, 9);
+        emit sendToLog("Hofi received data: " + organisedBuffer);
+        emit hofi_readyToProcess(organisedBuffer);
+        hofiReceiveBuffer.remove(0, 9);
+
         if (hofiReceiveBuffer.length() >= 9)    //Check again if another command still remains.
         {
             readHofiData();
