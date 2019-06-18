@@ -195,6 +195,8 @@ void MainWindow::on_pbConnectPorts_released()
         {
             m_SPSConfig->initTcpServer();
             m_processSerialData->m_serialConfig->initSerialPorts();
+            m_MFCOperation->remoteMode = true;
+            m_MFCOperation->updateDisplay();
             ui->cbCesarPort->setEnabled(false);
             ui->cbKJLPort->setEnabled(false);
             ui->cbKJL2Port->setEnabled(false);
@@ -207,6 +209,8 @@ void MainWindow::on_pbConnectPorts_released()
     {
         m_processSerialData->m_serialConfig->closePorts();
         m_SPSConfig->stopListening();
+        m_MFCOperation->remoteMode = false;
+        m_MFCOperation->updateDisplay();
         ui->cbCesarPort->setEnabled(true);
         ui->cbKJLPort->setEnabled(true);
         ui->cbKJL2Port->setEnabled(true);
