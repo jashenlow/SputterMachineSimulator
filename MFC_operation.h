@@ -14,6 +14,8 @@ public:
     explicit MFCOperation(QObject *parent = nullptr);
     ~MFCOperation();
 
+    bool remoteMode;
+
     void MFCloadDefaults();
     void setUiPointers(Ui::MainWindow *ptr);
 
@@ -21,6 +23,7 @@ signals:
     void writetoMFCPort(QByteArray data);
 
 public slots:
+    void updateDisplay();
     void queryRange(int channel);
     void queryRemoteMode();
     void queryValveState(char channel);
@@ -32,10 +35,10 @@ public slots:
     void errorHandler(QByteArray error);
 
 private slots:
-    void updateDisplay();
+
 
 private:
-    bool remoteMode, setPoint_EN, CH1_valveState, CH2_valveState;
+    bool setPoint_EN, CH1_valveState, CH2_valveState;
     int CH1_unit, CH2_unit, displayNumber;
     double FL1, FL2,
            SP1, SP2,
